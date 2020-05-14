@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::convert::From;
 
 #[derive(Debug)]
 pub enum Instractions {
@@ -10,26 +10,24 @@ pub enum Instractions {
     GetChar,
     JmpLeft,
     JmpRight,
+    Nop,
 }
 
 #[derive(Debug)]
 pub struct ParseError;
 
-impl FromStr for Instractions {
-    type Err = ParseError;
-    
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let instraction = match s {
-            "😅" => Instractions::PtrIncr,
-            "😭" => Instractions::PtrDecr,
-            "😘" => Instractions::ValIncr,
-            "😚" => Instractions::ValDecr,
-            "💦" => Instractions::PutChar,
-            "⁉" => Instractions::GetChar,
-            "✋" => Instractions::JmpLeft,
-            "🤟" => Instractions::JmpRight,
-            _ => return Err(ParseError),
-        };
-        Ok(instraction)
+impl From<char> for Instractions {
+    fn from(c: char) -> Self {
+        match c {
+            '😅' => Instractions::PtrIncr,
+            '😭' => Instractions::PtrDecr,
+            '😘' => Instractions::ValIncr,
+            '😚' => Instractions::ValDecr,
+            '💦' => Instractions::PutChar,
+            '⁉' => Instractions::GetChar,
+            '✋' => Instractions::JmpLeft,
+            '🤟' => Instractions::JmpRight,
+            _ => Instractions::Nop,
+        }
     }
 }

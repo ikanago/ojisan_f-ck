@@ -1,7 +1,6 @@
-use ojisan_fuck::instractions;
-use std::convert::From;
+use ojisan_fuck::interpreter::Interpreter;
 
 fn main() {
-    let i = instractions::Instractions::from('😘');
-    println!("{:?}", i);
+    let interpreter = Interpreter::new("😅😭😘😚💦⁉✋🤟");
+    println!("{:?}", interpreter.instructions);
 }

@@ -1,6 +1,6 @@
 use std::convert::From;
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum Instractions {
     PtrIncr,
     PtrDecr,

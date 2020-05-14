@@ -1,5 +1,7 @@
-use ojisan_fuck::test;
+use ojisan_fuck::instractions;
+use std::str::FromStr;
 
 fn main() {
-    test::test();
+    let i = instractions::Instractions::from_str("😘").unwrap();
+    println!("{:?}", i);
 }

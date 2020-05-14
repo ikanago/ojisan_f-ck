@@ -20,10 +20,35 @@ impl Interpreter {
         }
 
         Self {
-            instructions,
             memory: Vec::new(),
+            instructions,
             memory_pointer: 0,
             insruction_pointer: 0,
         }
     }
+
+    pub fn eval(&mut self) {
+        while self.insruction_pointer < self.instructions.len() {
+            match self.instructions[self.insruction_pointer] {
+                Instractions::PtrIncr => self.pointer_increment(),
+                Instractions::PtrDecr => self.pointer_decrement(),
+                Instractions::ValIncr => self.value_increment(),
+                Instractions::ValDecr => self.value_decrement(),
+                Instractions::PutChar => self.put_char(),
+                Instractions::GetChar => self.get_char(),
+                Instractions::JmpLeft => self.jump_forward(),
+                Instractions::JmpRight => self.jump_backward(),
+                Instractions::Nop => unreachable!(),
+            }
+        }
+    }
+
+    fn pointer_increment(&mut self) {}
+    fn pointer_decrement(&mut self) {}
+    fn value_increment(&mut self) {}
+    fn value_decrement(&mut self) {}
+    fn put_char(&mut self) {}
+    fn get_char(&mut self) {}
+    fn jump_forward(&mut self) {}
+    fn jump_backward(&mut self) {}
 }

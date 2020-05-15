@@ -19,3 +19,11 @@ pub fn transpile_from(source: &str) -> String {
     }
     transpiled_code.into_iter().collect::<String>()
 }
+
+#[derive(Debug)]
+pub enum EvalError {
+    MemoryOverflow,
+    MemoryUnderflow,
+    MemoryOutOfRange,
+    UnbalancedBracket,
+}

@@ -18,7 +18,13 @@ fn main() {
             println!("{}", ojisan_fuck::transpile_from(code));
         } else {
             let mut interpreter = Interpreter::new(code);
-            interpreter.eval();
+            match interpreter.eval() {
+                Err(err) => {
+                    eprintln!("{:?}: ", err);
+                    eprintln!("")
+                }
+                _ => ()
+            };
         };
     } else {
         eprintln!("Specify source code.");

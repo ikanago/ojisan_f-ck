@@ -14,12 +14,12 @@ fn main() {
     .get_matches();
 
     if let Some(ref code) = matches.value_of("CODE") {
-        let mut interpreter = if matches.is_present("transpile") {
-            Interpreter::transpile_from(code)
+        if matches.is_present("transpile") {
+            println!("{}", ojisan_fuck::transpile_from(code));
         } else {
-            Interpreter::new(code)
+            let mut interpreter = Interpreter::new(code);
+            interpreter.eval();
         };
-        interpreter.eval();
     } else {
         eprintln!("Specify source code.");
         panic!();

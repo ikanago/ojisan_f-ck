@@ -2,8 +2,9 @@
 extern crate clap;
 
 use ojisan_fuck::interpreter::Interpreter;
+use std::io::{self, Read};
 
-fn main() {
+fn main() -> Result<(), io::Error>{
     let matches = clap_app!(ojisan_fuck =>
         (version: crate_version!())
         (author: crate_authors!())
@@ -17,17 +18,22 @@ fn main() {
         if matches.is_present("transpile") {
             println!("{}", ojisan_fuck::transpile_from(code));
         } else {
-            let mut interpreter = Interpreter::new(code);
+            let mut buffer = String::new();
+            let stdin = io::stdin();
+            let mut handle = stdin.lock();
+            handle.read_to_string(&mut buffer)?;
+
+            let mut interpreter = Interpreter::new(code, buffer);
             match interpreter.eval() {
+                Ok(_) => println!("{}", interpreter.output_buffer.iter().collect::<String>()),
                 Err(err) => {
-                    eprintln!("{:?}: ", err);
-                    eprintln!("")
+                    eprintln!("{:?}", err);
                 }
-                _ => ()
             };
         };
     } else {
         eprintln!("Specify source code.");
         panic!();
     }
+    Ok(())
 }

@@ -1,6 +1,5 @@
 pub mod instractions;
 pub mod interpreter;
-pub mod transpile;
 
 pub fn transpile_from(source: &str) -> String {
     let mut transpiled_code = Vec::new();
@@ -26,4 +25,5 @@ pub enum EvalError {
     MemoryUnderflow,
     MemoryOutOfRange,
     UnbalancedBracket,
+    InputExhausted,
 }

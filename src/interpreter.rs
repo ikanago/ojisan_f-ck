@@ -1,20 +1,23 @@
 use crate::instractions::Instractions;
 use crate::EvalError;
+use std::collections::VecDeque;
 use std::convert::From;
 
 #[derive(Debug)]
 pub struct Interpreter {
-    pub memory: Vec<u8>,
-    pub instructions: Vec<Instractions>,
-    pub memory_pointer: usize,
-    pub insruction_pointer: usize,
-    pub loop_stack: Vec<usize>,
+    memory: Vec<u8>,
+    instructions: Vec<Instractions>,
+    memory_pointer: usize,
+    insruction_pointer: usize,
+    input_buffer: VecDeque<u8>,
+    pub output_buffer: Vec<char>,
+    loop_stack: Vec<usize>,
 }
 
 impl Interpreter {
     /// Parse source code into intermediate representation of instruction ignoreing
     /// unexpected characters and return new `Interpreter`.
-    pub fn new(source: &str) -> Self {
+    pub fn new(source: &str, buffer: String) -> Self {
         let mut instructions = Vec::new();
         for c in source.chars() {
             let instruction = Instractions::from(c);
@@ -23,11 +26,18 @@ impl Interpreter {
             }
         }
 
+        let mut input_buffer = VecDeque::new();
+        for c in buffer.chars() {
+            input_buffer.push_back(c as u8);
+        }
+
         Self {
             memory: vec![0; 256],
             instructions,
             memory_pointer: 0,
             insruction_pointer: 0,
+            input_buffer,
+            output_buffer: Vec::new(),
             loop_stack: Vec::new(),
         }
     }
@@ -87,13 +97,17 @@ impl Interpreter {
         Ok(())
     }
 
-    fn put_char(&self) -> Result<(), EvalError> {
-        let c = self.memory[self.memory_pointer] as char;
-        print!("{}", c);
+    fn put_char(&mut self) -> Result<(), EvalError> {
+        let c = self.memory[self.memory_pointer];
+        self.output_buffer.push(c as char);
         Ok(())
     }
 
     fn get_char(&mut self) -> Result<(), EvalError> {
+        self.memory[self.memory_pointer] = match self.input_buffer.pop_front() {
+            Some(input) => input,
+            None => return Err(EvalError::InputExhausted),
+        };
         Ok(())
     }
 

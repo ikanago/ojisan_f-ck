@@ -39,8 +39,8 @@ impl Interpreter {
                 Instractions::ValDecr => self.value_decrement(),
                 Instractions::PutChar => self.put_char(),
                 Instractions::GetChar => self.get_char(),
-                Instractions::JmpLeft => self.jump_forward(),
-                Instractions::JmpRight => self.jump_backward(),
+                Instractions::BeginLoop => self.begin_loop(),
+                Instractions::EndLoop => self.end_loop(),
                 Instractions::Nop => unreachable!(),
             };
             self.insruction_pointer += 1;
@@ -81,6 +81,6 @@ impl Interpreter {
     }
 
     fn get_char(&mut self) {}
-    fn jump_forward(&mut self) {}
-    fn jump_backward(&mut self) {}
+    fn begin_loop(&mut self) {}
+    fn end_loop(&mut self) {}
 }

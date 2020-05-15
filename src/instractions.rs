@@ -8,8 +8,8 @@ pub enum Instractions {
     ValDecr,
     PutChar,
     GetChar,
-    JmpLeft,
-    JmpRight,
+    BeginLoop,
+    EndLoop,
     Nop,
 }
 
@@ -25,8 +25,8 @@ impl From<char> for Instractions {
             '😚' => Instractions::ValDecr,
             '💦' => Instractions::PutChar,
             '⁉' => Instractions::GetChar,
-            '✋' => Instractions::JmpLeft,
-            '🤟' => Instractions::JmpRight,
+            '✋' => Instractions::BeginLoop,
+            '🤟' => Instractions::EndLoop,
             _ => Instractions::Nop,
         }
     }

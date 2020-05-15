@@ -7,6 +7,7 @@ pub struct Interpreter {
     pub instructions: Vec<Instractions>,
     pub memory_pointer: usize,
     pub insruction_pointer: usize,
+    pub loop_stack: Vec<usize>,
 }
 
 impl Interpreter {
@@ -26,6 +27,7 @@ impl Interpreter {
             instructions,
             memory_pointer: 0,
             insruction_pointer: 0,
+            loop_stack: Vec::new(),
         }
     }
 
@@ -81,6 +83,34 @@ impl Interpreter {
     }
 
     fn get_char(&mut self) {}
-    fn begin_loop(&mut self) {}
-    fn end_loop(&mut self) {}
+
+    fn begin_loop(&mut self) {
+        self.loop_stack.push(self.insruction_pointer);
+        if self.memory[self.memory_pointer] == 0 {
+            self.jump_to_corresponding_loop_end();
+        }
+    }
+
+    fn jump_to_corresponding_loop_end(&mut self) {
+        let mut instraction_pointer = self.insruction_pointer;
+        while self.loop_stack.len() > 0 {
+            match self.instructions[instraction_pointer] {
+                Instractions::BeginLoop => self.loop_stack.push(instraction_pointer),
+                Instractions::EndLoop => instraction_pointer = self.loop_stack.pop().unwrap(),
+                _ => continue,
+            }
+        }
+        self.insruction_pointer = instraction_pointer;
+    }
+
+    fn end_loop(&mut self) {
+        let loop_begin = match self.loop_stack.pop() {
+            Some(pointer) => pointer,
+            None => unimplemented!(),
+        };
+        if self.memory[self.memory_pointer] != 0 {
+            self.insruction_pointer = loop_begin;
+            self.loop_stack.push(loop_begin);
+        }
+    }
 }

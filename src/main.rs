@@ -1,7 +1,8 @@
 use ojisan_fuck::interpreter::Interpreter;
 
 fn main() {
-    let mut interpreter = Interpreter::new("😅😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘💦");
+    let code = "😘😘😘😘😘😘😘😘✋😚😅😘😘😘😘😘😘😘😘😘😭🤟😅💦";
+    let mut interpreter = Interpreter::new(code);
     interpreter.eval();
     println!("{:?}", interpreter.instructions);
     println!("{:?}", interpreter.memory);

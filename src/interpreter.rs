@@ -3,13 +3,15 @@ use std::convert::From;
 
 #[derive(Debug)]
 pub struct Interpreter {
-    pub memory: Vec<i64>,
+    pub memory: Vec<u8>,
     pub instructions: Vec<Instractions>,
     pub memory_pointer: usize,
     pub insruction_pointer: usize,
 }
 
 impl Interpreter {
+    /// Parse source code into intermediate representation of instruction ignoreing
+    /// unexpected characters and return new `Interpreter`.
     pub fn new(source: &str) -> Self {
         let mut instructions = Vec::new();
         for c in source.chars() {
@@ -27,6 +29,7 @@ impl Interpreter {
         }
     }
 
+    /// Evaluate parsed code.
     pub fn eval(&mut self) {
         while self.insruction_pointer < self.instructions.len() {
             match self.instructions[self.insruction_pointer] {
@@ -72,7 +75,11 @@ impl Interpreter {
         }
     }
 
-    fn put_char(&mut self) {}
+    fn put_char(&self) {
+        let c = self.memory[self.memory_pointer] as char;
+        print!("{}", c);
+    }
+
     fn get_char(&mut self) {}
     fn jump_forward(&mut self) {}
     fn jump_backward(&mut self) {}

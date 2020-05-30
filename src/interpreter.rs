@@ -120,18 +120,18 @@ impl Interpreter {
     }
 
     fn jump_to_corresponding_loop_end(&mut self) -> Result<(), EvalError> {
-        let mut instraction_pointer = self.insruction_pointer;
+        let mut instruction_pointer = self.insruction_pointer;
         while self.loop_stack.len() > 0 {
-            if instraction_pointer >= self.instructions.len() {
+            if instruction_pointer >= self.instructions.len() {
                 return Err(EvalError::UnbalancedBracket);
             }
-            match self.instructions[instraction_pointer] {
-                Instructions::BeginLoop => self.loop_stack.push(instraction_pointer),
-                Instructions::EndLoop => instraction_pointer = self.loop_stack.pop().unwrap(),
+            match self.instructions[instruction_pointer] {
+                Instructions::BeginLoop => self.loop_stack.push(instruction_pointer),
+                Instructions::EndLoop => instruction_pointer = self.loop_stack.pop().unwrap(),
                 _ => continue,
             }
         }
-        self.insruction_pointer = instraction_pointer;
+        self.insruction_pointer = instruction_pointer;
         Ok(())
     }
 

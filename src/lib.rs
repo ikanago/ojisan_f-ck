@@ -1,4 +1,4 @@
-pub mod instractions;
+pub mod instructions;
 pub mod interpreter;
 
 pub fn transpile_from(source: &str) -> String {

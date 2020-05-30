@@ -1,4 +1,4 @@
-use crate::instractions::Instractions;
+use crate::instructions::Instructions;
 use crate::EvalError;
 use std::collections::VecDeque;
 use std::convert::From;
@@ -6,7 +6,7 @@ use std::convert::From;
 #[derive(Debug)]
 pub struct Interpreter {
     memory: Vec<u8>,
-    instructions: Vec<Instractions>,
+    instructions: Vec<Instructions>,
     memory_pointer: usize,
     insruction_pointer: usize,
     input_buffer: VecDeque<u8>,
@@ -20,8 +20,8 @@ impl Interpreter {
     pub fn new(source: &str, buffer: String) -> Self {
         let mut instructions = Vec::new();
         for c in source.chars() {
-            let instruction = Instractions::from(c);
-            if instruction != Instractions::Nop {
+            let instruction = Instructions::from(c);
+            if instruction != Instructions::Nop {
                 instructions.push(instruction);
             }
         }
@@ -46,15 +46,15 @@ impl Interpreter {
     pub fn eval(&mut self) -> Result<(), EvalError> {
         while self.insruction_pointer < self.instructions.len() {
             match self.instructions[self.insruction_pointer] {
-                Instractions::PtrIncr => self.pointer_increment()?,
-                Instractions::PtrDecr => self.pointer_decrement()?,
-                Instractions::ValIncr => self.value_increment()?,
-                Instractions::ValDecr => self.value_decrement()?,
-                Instractions::PutChar => self.put_char()?,
-                Instractions::GetChar => self.get_char()?,
-                Instractions::BeginLoop => self.begin_loop()?,
-                Instractions::EndLoop => self.end_loop()?,
-                Instractions::Nop => unreachable!(),
+                Instructions::PtrIncr => self.pointer_increment()?,
+                Instructions::PtrDecr => self.pointer_decrement()?,
+                Instructions::ValIncr => self.value_increment()?,
+                Instructions::ValDecr => self.value_decrement()?,
+                Instructions::PutChar => self.put_char()?,
+                Instructions::GetChar => self.get_char()?,
+                Instructions::BeginLoop => self.begin_loop()?,
+                Instructions::EndLoop => self.end_loop()?,
+                Instructions::Nop => unreachable!(),
             };
             self.insruction_pointer += 1;
         }
@@ -120,18 +120,18 @@ impl Interpreter {
     }
 
     fn jump_to_corresponding_loop_end(&mut self) -> Result<(), EvalError> {
-        let mut instraction_pointer = self.insruction_pointer;
+        let mut instruction_pointer = self.insruction_pointer;
         while self.loop_stack.len() > 0 {
-            if instraction_pointer >= self.instructions.len() {
+            if instruction_pointer >= self.instructions.len() {
                 return Err(EvalError::UnbalancedBracket);
             }
-            match self.instructions[instraction_pointer] {
-                Instractions::BeginLoop => self.loop_stack.push(instraction_pointer),
-                Instractions::EndLoop => instraction_pointer = self.loop_stack.pop().unwrap(),
+            match self.instructions[instruction_pointer] {
+                Instructions::BeginLoop => self.loop_stack.push(instruction_pointer),
+                Instructions::EndLoop => instruction_pointer = self.loop_stack.pop().unwrap(),
                 _ => continue,
             }
         }
-        self.insruction_pointer = instraction_pointer;
+        self.insruction_pointer = instruction_pointer;
         Ok(())
     }
 

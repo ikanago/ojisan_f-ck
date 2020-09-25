@@ -5,6 +5,8 @@ authors = ["ikanago <28985004+ikanago@users.noreply.github.com>"]
 edition = "2018"
 description = "Brain-fuck interpreter parsing emoji used by Japanese ojisans"
 license = "MIT"
+repository = "https://github.com/ikanago/ojisan_f-ck"
+keywords = ["esolang", "interpreter"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

@@ -3,14 +3,22 @@ use crate::EvalError;
 use std::collections::VecDeque;
 use std::convert::From;
 
+/// Executes given ojisanf-ck code.
 #[derive(Debug)]
 pub struct Interpreter {
+    // Memory cells.
     memory: Vec<u8>,
+    // Array of instructions.
     instructions: Vec<Instructions>,
+    // Current memory index.
     memory_pointer: usize,
+    // Current instruction index.
     insruction_pointer: usize,
+    // Buffer of user input. This is not interactive.
     input_buffer: VecDeque<u8>,
+    // Buffer of output.
     pub output_buffer: Vec<char>,
+    // Holds index of matching `[` to which `]` jumps back.
     loop_stack: Vec<usize>,
 }
 
@@ -18,17 +26,21 @@ impl Interpreter {
     /// Parse source code into intermediate representation of instruction ignoreing
     /// unexpected characters and return new `Interpreter`.
     pub fn new(source: &str, buffer: String) -> Self {
-        let mut instructions = Vec::new();
-        for c in source.chars() {
-            let instruction = Instructions::from(c);
-            if instruction != Instructions::Nop {
-                instructions.push(instruction);
-            }
-        }
+        let instructions = source
+            .chars()
+            .filter_map(|c| {
+                let instruction = Instructions::from(c);
+                if instruction != Instructions::Nop {
+                    Some(instruction)
+                } else {
+                    None
+                }
+            })
+            .collect();
         let input_buffer: VecDeque<u8> = buffer.chars().map(|c| c as u8).collect();
 
         Self {
-            memory: vec![0; 256],
+            memory: vec![0; 30_000],
             instructions,
             memory_pointer: 0,
             insruction_pointer: 0,

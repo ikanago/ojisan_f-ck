@@ -2,7 +2,7 @@ use clap::{clap_app, crate_description, crate_version};
 use ojisan_fuck::interpreter::Interpreter;
 use std::io::{self, Read};
 
-fn main() -> Result<(), io::Error> {
+fn main() -> io::Result<()> {
     let matches = clap_app!(ojisan_fuck =>
         (version: crate_version!())
         (about: crate_description!())
@@ -22,7 +22,7 @@ fn main() -> Result<(), io::Error> {
 
             let mut interpreter = Interpreter::new(code, buffer);
             match interpreter.eval() {
-                Ok(_) => println!("{}", interpreter.output_buffer.iter().collect::<String>()),
+                Ok(_) => println!("{}", interpreter.output()),
                 Err(err) => {
                     eprintln!("{:?}", err);
                 }

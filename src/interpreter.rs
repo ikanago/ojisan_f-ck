@@ -13,11 +13,11 @@ pub struct Interpreter {
     // Current memory index.
     memory_pointer: usize,
     // Current instruction index.
-    insruction_pointer: usize,
+    instruction_pointer: usize,
     // Buffer of user input. This is not interactive.
     input_buffer: VecDeque<u8>,
     // Buffer of output.
-    pub output_buffer: Vec<char>,
+    output_buffer: Vec<char>,
     // Holds index of matching `[` to which `]` jumps back.
     loop_stack: Vec<usize>,
 }
@@ -43,7 +43,7 @@ impl Interpreter {
             memory: vec![0; 30_000],
             instructions,
             memory_pointer: 0,
-            insruction_pointer: 0,
+            instruction_pointer: 0,
             input_buffer,
             output_buffer: Vec::new(),
             loop_stack: Vec::new(),
@@ -52,8 +52,8 @@ impl Interpreter {
 
     /// Evaluate parsed code.
     pub fn eval(&mut self) -> Result<(), EvalError> {
-        while self.insruction_pointer < self.instructions.len() {
-            match self.instructions[self.insruction_pointer] {
+        while self.instruction_pointer < self.instructions.len() {
+            match self.instructions[self.instruction_pointer] {
                 Instructions::PtrIncr => self.pointer_increment()?,
                 Instructions::PtrDecr => self.pointer_decrement()?,
                 Instructions::ValIncr => self.value_increment()?,
@@ -64,7 +64,7 @@ impl Interpreter {
                 Instructions::EndLoop => self.end_loop()?,
                 Instructions::Nop => unreachable!(),
             };
-            self.insruction_pointer += 1;
+            self.instruction_pointer += 1;
         }
 
         if self.loop_stack.len() != 0 {
@@ -73,10 +73,15 @@ impl Interpreter {
         Ok(())
     }
 
+    // Convert output buffer into a string.
+    pub fn output(&self) -> String {
+        self.output_buffer.iter().collect()
+    }
+
     fn pointer_increment(&mut self) -> Result<(), EvalError> {
         match self.memory_pointer.checked_add(1) {
             Some(memory_pointer) => self.memory_pointer = memory_pointer,
-            None => return Err(EvalError::MemoryOverflow),
+            None => return Err(EvalError::MemoryOutOfRange),
         }
         Ok(())
     }
@@ -84,24 +89,22 @@ impl Interpreter {
     fn pointer_decrement(&mut self) -> Result<(), EvalError> {
         match self.memory_pointer.checked_sub(1) {
             Some(memory_pointer) => self.memory_pointer = memory_pointer,
-            None => return Err(EvalError::MemoryUnderflow),
+            None => return Err(EvalError::MemoryOutOfRange),
         }
         Ok(())
     }
 
     fn value_increment(&mut self) -> Result<(), EvalError> {
-        match self.memory[self.memory_pointer].checked_add(1) {
-            Some(value) => self.memory[self.memory_pointer] = value,
-            None => return Err(EvalError::MemoryOutOfRange),
-        }
+        let value = self.memory[self.memory_pointer].checked_add(1).unwrap_or(0);
+        self.memory[self.memory_pointer] = value;
         Ok(())
     }
 
     fn value_decrement(&mut self) -> Result<(), EvalError> {
-        match self.memory[self.memory_pointer].checked_sub(1) {
-            Some(value) => self.memory[self.memory_pointer] = value,
-            None => return Err(EvalError::MemoryOutOfRange),
-        }
+        let value = self.memory[self.memory_pointer]
+            .checked_sub(1)
+            .unwrap_or(std::u8::MAX);
+        self.memory[self.memory_pointer] = value;
         Ok(())
     }
 
@@ -120,38 +123,127 @@ impl Interpreter {
     }
 
     fn begin_loop(&mut self) -> Result<(), EvalError> {
-        self.loop_stack.push(self.insruction_pointer);
+        self.loop_stack.push(self.instruction_pointer);
         if self.memory[self.memory_pointer] == 0 {
-            self.jump_to_corresponding_loop_end()?;
+            self.instruction_pointer = self.corresponding_loop_end()?;
         }
         Ok(())
     }
 
-    fn jump_to_corresponding_loop_end(&mut self) -> Result<(), EvalError> {
-        let mut instruction_pointer = self.insruction_pointer;
-        while self.loop_stack.len() > 0 {
-            if instruction_pointer >= self.instructions.len() {
+    // Returns index of corresponding loop end.
+    fn corresponding_loop_end(&self) -> Result<usize, EvalError> {
+        let mut nest_level = 0;
+        let mut instruction_pointer = self.instruction_pointer + 1;
+        while nest_level > 0 || self.instructions[instruction_pointer] != Instructions::EndLoop {
+            if self.instructions[instruction_pointer] == Instructions::BeginLoop {
+                nest_level += 1;
+            } else if self.instructions[instruction_pointer] == Instructions::EndLoop {
+                nest_level -= 1;
+            }
+            instruction_pointer += 1;
+            if instruction_pointer == self.instructions.len() {
                 return Err(EvalError::UnbalancedBracket);
             }
-            match self.instructions[instruction_pointer] {
-                Instructions::BeginLoop => self.loop_stack.push(instruction_pointer),
-                Instructions::EndLoop => instruction_pointer = self.loop_stack.pop().unwrap(),
-                _ => continue,
-            }
         }
-        self.insruction_pointer = instruction_pointer;
-        Ok(())
+        Ok(instruction_pointer)
     }
 
+    // By using stack to memorize index of `[`, jump to corresponding loop origin without scanning code again.
     fn end_loop(&mut self) -> Result<(), EvalError> {
         let loop_begin = match self.loop_stack.pop() {
             Some(pointer) => pointer,
             None => return Err(EvalError::UnbalancedBracket),
         };
         if self.memory[self.memory_pointer] != 0 {
-            self.insruction_pointer = loop_begin;
+            self.instruction_pointer = loop_begin;
             self.loop_stack.push(loop_begin);
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::interpreter::Interpreter;
+
+    #[test]
+    fn overflowing_addtion() {
+        // `+`
+        let source = "😘";
+        let mut interpreter = Interpreter::new(source, String::new());
+        interpreter.memory[0] = 255;
+        interpreter.eval().unwrap();
+        assert_eq!(0, interpreter.memory[0]);
+    }
+
+    #[test]
+    fn overflowing_subtraction() {
+        // `-`
+        let source = "😚";
+        let mut interpreter = Interpreter::new(source, String::new());
+        interpreter.eval().unwrap();
+        assert_eq!(255, interpreter.memory[0]);
+    }
+
+    #[test]
+    fn test_jump_to_loop_end() {
+        // `[+]+
+        let source = "✋😘🤟😘";
+        let interpreter = Interpreter::new(source, String::new());
+        assert_eq!(2, interpreter.corresponding_loop_end().unwrap());
+    }
+
+    #[test]
+    fn test_jump_to_nested_loop_end() {
+        // `[+++[>++<-]-]+`
+        let source = "✋😘😘😘✋😅😘😘😭😚🤟😚🤟😘";
+        let mut interpreter = Interpreter::new(source, String::new());
+        assert_eq!(
+            12,
+            interpreter.corresponding_loop_end().unwrap(),
+            "Matching outer loop"
+        );
+        interpreter.instruction_pointer = 4;
+        assert_eq!(
+            10,
+            interpreter.corresponding_loop_end().unwrap(),
+            "Matching inner loop"
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_lacking_end_of_loop() {
+        // `[+++[>++<-]-`
+        let source = "✋😘😘😘✋😅😘😘😭😚🤟😚";
+        let mut interpreter = Interpreter::new(source, String::new());
+        interpreter.eval().unwrap();
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_lacking_begining_of_loop() {
+        // `+[-]-]+`
+        let source = "😘✋😚🤟😚🤟😘";
+        let mut interpreter = Interpreter::new(source, String::new());
+        interpreter.eval().unwrap();
+    }
+
+    #[test]
+    fn test_input() {
+        // `,.,.,.`
+        let source = "⁉💦⁉💦⁉💦";
+        let mut interpreter = Interpreter::new(source, "abc".to_string());
+        interpreter.eval().unwrap();
+        assert_eq!("abc", interpreter.output());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_exhaustive_input() {
+        // `,.,.,.`
+        let source = "⁉💦⁉💦⁉💦";
+        let mut interpreter = Interpreter::new(source, "ab".to_string());
+        interpreter.eval().unwrap();
     }
 }

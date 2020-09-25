@@ -1,11 +1,10 @@
-use clap::{clap_app, crate_authors, crate_description, crate_version};
+use clap::{clap_app, crate_description, crate_version};
 use ojisan_fuck::interpreter::Interpreter;
 use std::io::{self, Read};
 
 fn main() -> Result<(), io::Error> {
     let matches = clap_app!(ojisan_fuck =>
         (version: crate_version!())
-        (author: crate_authors!())
         (about: crate_description!())
         (@arg CODE: +required "Input source code.")
         (@arg transpile: --transpile "If specified, transpile from basic brainfuck code.")

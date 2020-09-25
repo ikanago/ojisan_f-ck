@@ -3,6 +3,7 @@ name = "ojisan_fuck"
 version = "0.1.0"
 authors = ["ikanago <28985004+ikanago@users.noreply.github.com>"]
 edition = "2018"
+description = "Brain-fuck interpreter parsing emoji used by Japanese ojisans"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

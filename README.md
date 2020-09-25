@@ -4,18 +4,24 @@
 
 This is brainf-ck interpreter parsing emoji. I chose emojis which is often used by Japanese ojisan(middle-aged men) chatting with girls.
 
+## Installation🚚
+Install via cargo:
+```bash
+cargo install ojisan_fuck
+```
+
 ## Usage😘
 Transpile brainf-ck code to ojisanf-ck code:
 ```bash
-cargo run -- --transpile '+++++++++[>++++++++>+++++++++++>+++>+<<<<-]>.>++.+++++++..+++.>+++++.<<+++++++++++++++.>.+++.------.--------.>+.>+.'
+ojisan_fuck --transpile '+++++++++[>++++++++>+++++++++++>+++>+<<<<-]>.>++.+++++++..+++.>+++++.<<+++++++++++++++.>.+++.------.--------.>+.>+.'
 ```
 
 Interpret ojisanf-ck code:
 ```bash
-cargo run -- -c 😘😘😘😘😘😘😘😘😘✋😅😘😘😘😘😘😘😘😘😅😘😘😘😘😘😘😘😘😘😘😘😅😘😘😘😅😘😭😭😭😭😚🤟😅💦😅😘😘💦😘😘😘😘😘😘😘💦💦😘😘😘💦😅😘😘😘😘😘💦😭😭😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘💦😅💦😘😘😘💦😚😚😚😚😚😚💦😚😚😚😚😚😚😚😚💦😅😘💦😅😘💦
+ojisan_fuck -c 😘😘😘😘😘😘😘😘😘✋😅😘😘😘😘😘😘😘😘😅😘😘😘😘😘😘😘😘😘😘😘😅😘😘😘😅😘😭😭😭😭😚🤟😅💦😅😘😘💦😘😘😘😘😘😘😘💦💦😘😘😘💦😅😘😘😘😘😘💦😭😭😘😘😘😘😘😘😘😘😘😘😘😘😘😘😘💦😅💦😘😘😘💦😚😚😚😚😚😚💦😚😚😚😚😚😚😚😚💦😅😘💦😅😘💦
 ```
 
 Or pass source code from a file:
 ```bash
-cargo run -- hello_world.of
+ojisan_fuck hello_world.of
 ```

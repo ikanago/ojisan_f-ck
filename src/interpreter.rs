@@ -17,7 +17,7 @@ pub struct Interpreter {
     // Buffer of user input. This is not interactive.
     input_buffer: VecDeque<u8>,
     // Buffer of output.
-    pub output_buffer: Vec<char>,
+    output_buffer: Vec<char>,
     // Holds index of matching `[` to which `]` jumps back.
     loop_stack: Vec<usize>,
 }
@@ -73,6 +73,11 @@ impl Interpreter {
         Ok(())
     }
 
+    // Convert output buffer into a string.
+    pub fn output(&self) -> String {
+        self.output_buffer.iter().collect()
+    }
+
     fn pointer_increment(&mut self) -> Result<(), EvalError> {
         match self.memory_pointer.checked_add(1) {
             Some(memory_pointer) => self.memory_pointer = memory_pointer,
@@ -126,7 +131,7 @@ impl Interpreter {
     }
 
     // Returns index of corresponding loop end.
-    fn corresponding_loop_end(&mut self) -> Result<usize, EvalError> {
+    fn corresponding_loop_end(&self) -> Result<usize, EvalError> {
         let mut nest_level = 0;
         let mut instruction_pointer = self.instruction_pointer + 1;
         while nest_level > 0 || self.instructions[instruction_pointer] != Instructions::EndLoop {
@@ -184,7 +189,7 @@ mod tests {
     fn test_jump_to_loop_end() {
         // `[+]+
         let source = "✋😘🤟😘";
-        let mut interpreter = Interpreter::new(source, String::new());
+        let interpreter = Interpreter::new(source, String::new());
         assert_eq!(2, interpreter.corresponding_loop_end().unwrap());
     }
 
@@ -205,7 +210,7 @@ mod tests {
             "Matching inner loop"
         );
     }
-    
+
     #[test]
     #[should_panic]
     fn test_lacking_end_of_loop() {
@@ -224,4 +229,21 @@ mod tests {
         interpreter.eval().unwrap();
     }
 
+    #[test]
+    fn test_input() {
+        // `,.,.,.`
+        let source = "⁉💦⁉💦⁉💦";
+        let mut interpreter = Interpreter::new(source, "abc".to_string());
+        interpreter.eval().unwrap();
+        assert_eq!("abc", interpreter.output());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_exhaustive_input() {
+        // `,.,.,.`
+        let source = "⁉💦⁉💦⁉💦";
+        let mut interpreter = Interpreter::new(source, "ab".to_string());
+        interpreter.eval().unwrap();
+    }
 }

@@ -67,9 +67,9 @@ impl Interpreter {
             self.instruction_pointer += 1;
         }
 
-        // if self.loop_stack.len() != 0 {
-        //     return Err(EvalError::UnbalancedBracket);
-        // }
+        if self.loop_stack.len() != 0 {
+            return Err(EvalError::UnbalancedBracket);
+        }
         Ok(())
     }
 
@@ -136,10 +136,14 @@ impl Interpreter {
                 nest_level -= 1;
             }
             instruction_pointer += 1;
+            if instruction_pointer == self.instructions.len() {
+                return Err(EvalError::UnbalancedBracket);
+            }
         }
         Ok(instruction_pointer)
     }
 
+    // By using stack to memorize index of `[`, jump to corresponding loop origin without scanning code again.
     fn end_loop(&mut self) -> Result<(), EvalError> {
         let loop_begin = match self.loop_stack.pop() {
             Some(pointer) => pointer,
@@ -159,6 +163,7 @@ mod tests {
 
     #[test]
     fn overflowing_addtion() {
+        // `+`
         let source = "😘";
         let mut interpreter = Interpreter::new(source, String::new());
         interpreter.memory[0] = 255;
@@ -168,6 +173,7 @@ mod tests {
 
     #[test]
     fn overflowing_subtraction() {
+        // `-`
         let source = "😚";
         let mut interpreter = Interpreter::new(source, String::new());
         interpreter.eval().unwrap();
@@ -176,6 +182,7 @@ mod tests {
 
     #[test]
     fn test_jump_to_loop_end() {
+        // `[+]+
         let source = "✋😘🤟😘";
         let mut interpreter = Interpreter::new(source, String::new());
         assert_eq!(2, interpreter.corresponding_loop_end().unwrap());
@@ -183,10 +190,38 @@ mod tests {
 
     #[test]
     fn test_jump_to_nested_loop_end() {
+        // `[+++[>++<-]-]+`
         let source = "✋😘😘😘✋😅😘😘😭😚🤟😚🤟😘";
         let mut interpreter = Interpreter::new(source, String::new());
-        assert_eq!(12, interpreter.corresponding_loop_end().unwrap(), "Matching outer loop");
+        assert_eq!(
+            12,
+            interpreter.corresponding_loop_end().unwrap(),
+            "Matching outer loop"
+        );
         interpreter.instruction_pointer = 4;
-        assert_eq!(10, interpreter.corresponding_loop_end().unwrap(), "Matching inner loop");
+        assert_eq!(
+            10,
+            interpreter.corresponding_loop_end().unwrap(),
+            "Matching inner loop"
+        );
     }
+    
+    #[test]
+    #[should_panic]
+    fn test_lacking_end_of_loop() {
+        // `[+++[>++<-]-`
+        let source = "✋😘😘😘✋😅😘😘😭😚🤟😚";
+        let mut interpreter = Interpreter::new(source, String::new());
+        interpreter.eval().unwrap();
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_lacking_begining_of_loop() {
+        // `+[-]-]+`
+        let source = "😘✋😚🤟😚🤟😘";
+        let mut interpreter = Interpreter::new(source, String::new());
+        interpreter.eval().unwrap();
+    }
+
 }

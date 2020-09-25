@@ -1,10 +1,8 @@
-#[macro_use]
-extern crate clap;
-
+use clap::{clap_app, crate_authors, crate_description, crate_version};
 use ojisan_fuck::interpreter::Interpreter;
 use std::io::{self, Read};
 
-fn main() -> Result<(), io::Error>{
+fn main() -> Result<(), io::Error> {
     let matches = clap_app!(ojisan_fuck =>
         (version: crate_version!())
         (author: crate_authors!())

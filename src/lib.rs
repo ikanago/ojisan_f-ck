@@ -1,6 +1,8 @@
 pub mod instructions;
 pub mod interpreter;
 
+/// This function transpiles brainfuck code to ojisanfuck code.
+/// This is useful to generate ojisanfuck code.
 pub fn transpile_from(source: &str) -> String {
     let mut transpiled_code = Vec::new();
     for c in source.chars() {

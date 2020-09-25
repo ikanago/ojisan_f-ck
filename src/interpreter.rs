@@ -25,11 +25,7 @@ impl Interpreter {
                 instructions.push(instruction);
             }
         }
-
-        let mut input_buffer = VecDeque::new();
-        for c in buffer.chars() {
-            input_buffer.push_back(c as u8);
-        }
+        let input_buffer: VecDeque<u8> = buffer.chars().map(|c| c as u8).collect();
 
         Self {
             memory: vec![0; 256],

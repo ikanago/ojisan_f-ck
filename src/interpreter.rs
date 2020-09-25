@@ -18,13 +18,17 @@ impl Interpreter {
     /// Parse source code into intermediate representation of instruction ignoreing
     /// unexpected characters and return new `Interpreter`.
     pub fn new(source: &str, buffer: String) -> Self {
-        let mut instructions = Vec::new();
-        for c in source.chars() {
-            let instruction = Instructions::from(c);
-            if instruction != Instructions::Nop {
-                instructions.push(instruction);
-            }
-        }
+        let instructions = source
+            .chars()
+            .filter_map(|c| {
+                let instruction = Instructions::from(c);
+                if instruction != Instructions::Nop {
+                    Some(instruction)
+                } else {
+                    None
+                }
+            })
+            .collect();
         let input_buffer: VecDeque<u8> = buffer.chars().map(|c| c as u8).collect();
 
         Self {

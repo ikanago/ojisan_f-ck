@@ -1,6 +1,9 @@
 # ojisanf-ck😅
 
 ![Unit Test](https://github.com/ikanago/ojisan_f-ck/workflows/Unit%20Test/badge.svg?branch=master)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![](https://img.shields.io/crates/v/ojisan_fuck.svg)](https://crates.io/crates/ojisan_fuck)
+
 
 ## What's this🤔
 This is brainf-ck interpreter parsing emoji. I chose emojis which is often used by Japanese ojisan(middle-aged men) chatting with girls.

@@ -67,7 +67,7 @@ impl Interpreter {
             self.instruction_pointer += 1;
         }
 
-        if self.loop_stack.len() != 0 {
+        if !self.loop_stack.is_empty() {
             return Err(EvalError::UnbalancedBracket);
         }
         Ok(())

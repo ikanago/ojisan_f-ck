@@ -11,7 +11,7 @@ jobs:
     outputs:
       PROJECT_VERSION: ${{ env.PROJECT_VERSION }}
     env:
-      PROJECT_NAME: "omekasy"
+      PROJECT_NAME: "ojisan_fuck"
     strategy:
       fail-fast: false
       matrix:
@@ -47,7 +47,7 @@ jobs:
           EXE_SUFFIX=""
           [ "${{ matrix.job.target }}" = "x86_64-pc-windows-msvc" ] && EXE_SUFFIX=".exe"
 
-          BIN_PATH="target/${{ matrix.job.target }}/release/omekasy${EXE_SUFFIX}"
+          BIN_PATH="target/${{ matrix.job.target }}/release/${PROJECT_NAME}${EXE_SUFFIX}"
           echo "BIN_PATH=${BIN_PATH}" >> "${GITHUB_ENV}"
 
       - name: Strip binary

@@ -12,10 +12,17 @@ This is brainf-ck interpreter parsing emoji. I chose emojis which is often used 
 This is a joke language. I have NO intention to insult ojisan.
 
 ## Installation🚚
+Via Homebrew/Linuxbrew:
+```bash
+brew install ikanago/tap/ojisan_fuck
+```
+
 Install via cargo:
 ```bash
 cargo install ojisan_fuck
 ```
+
+Or binaries are avialable: [Release](https://github.com/ikanago/ojisan_f-ck/releases)
 
 ## Usage😘
 Transpile brainf-ck code to ojisanf-ck code:
